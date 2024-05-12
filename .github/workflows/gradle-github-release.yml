@@ -33,11 +33,11 @@ jobs:
     if: ${{ github.event.head_commit.message == 'Create release' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v4.1.5
 
       - name: Validate Gradle Wrapper
         if: ${{ inputs.run-gradle-validation == true }}
-        uses: gradle/wrapper-validation-action@v3.3.0
+        uses: gradle/wrapper-validation-action@v3.3.2
 
       - name: Setup Git
         run: |
