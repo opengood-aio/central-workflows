@@ -54,7 +54,9 @@ jobs:
           echo "PACKAGE_NAME=${group}.${name}" >> $GITHUB_ENV
 
       - name: Codestyle
-        uses: fabiocapasso93/gha-kotlin-linter@v1.1
+        uses: musichin/ktlint-check@v3
+        with:
+          ktlint-version: 1.2.1
 
       - name: Coverage
         uses: codecov/codecov-action@v4.4.0
