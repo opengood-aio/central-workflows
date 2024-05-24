@@ -3,4 +3,4 @@ on: [push]
 
 jobs:
   clear-packages:
-    uses: opengoodio/central-workflows/.github/workflows/workflow-clear-packages.yml@main
+    uses: opengood-aio/central-workflows/.github/workflows/workflow-clear-packages.yml@main
