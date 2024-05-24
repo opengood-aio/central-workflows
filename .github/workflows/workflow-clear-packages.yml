@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v4.1.6
 
       - name: Set Package Name
         run: |
@@ -17,7 +17,7 @@ jobs:
           name=$(awk '/rootProject.name/{print $NF; exit}' settings.gradle.kts | sed s/\'//g | sed s/\"//g)
           echo "PACKAGE_NAME=${group}.${name}" >> $GITHUB_ENV
 
-      - uses: actions/delete-package-versions@v4.1.1
+      - uses: actions/delete-package-versions@v5.0.0
         with:
           package-name: ${{ env.PACKAGE_NAME }}
           package-type: maven
