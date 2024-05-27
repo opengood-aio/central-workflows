@@ -55,10 +55,9 @@ jobs:
         run: |
           git config user.email ${GIT_EMAIL}
           git config user.name ${GIT_USER}
-          git config --global url.https://${{ secrets.workflow-token }}@github.com/.insteadOf https://github.com/
         env:
-          GIT_EMAIL: ${{ inputs.git-user }}
-          GIT_USER: ${{ inputs.git-email }}
+          GIT_EMAIL: ${{ inputs.git-email }}
+          GIT_USER: ${{ inputs.git-user }}
 
       - name: Setup Java
         uses: actions/setup-java@v4.2.1
