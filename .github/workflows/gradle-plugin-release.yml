@@ -32,6 +32,9 @@ on:
       gradle-publish-secret:
         description: Gradle plugin secret used for publishing to Gradle plugin repository
         required: true
+      workflow-token:
+        description: GitHub workflow secret for pushing automated commits
+        required: true
 
 jobs:
   gradle-plugin-release:
@@ -41,7 +44,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.6
         with:
-          token: ${{ secrets.WORKFLOW_TOKEN }}
+          token: ${{ secrets.workflow-token }}
 
       - name: Validate Gradle Wrapper
         if: ${{ inputs.run-gradle-validation == true }}
@@ -67,6 +70,6 @@ jobs:
           arguments: clean release -PskipTests=true -Prelease.useAutomaticVersion=true
           gradle-version: wrapper
         env:
-          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.workflow-token }}
           GRADLE_PUBLISH_KEY: ${{ secrets.gradle-publish-key }}
           GRADLE_PUBLISH_SECRET: ${{ secrets.gradle-publish-secret }}
