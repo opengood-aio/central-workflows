@@ -51,12 +51,10 @@ jobs:
         run: |
           git config user.email ${GIT_EMAIL}
           git config user.name ${GIT_USER}
-          git remote set-url origin https://x-access-token/:${GITHUB_TOKEN}@github.com/${GITHUB_REPO}
+          git remote set-url origin https://x-access-token/:${{ secrets.WORKFLOW_TOKEN }}@github.com/${{ github.repository }}
         env:
           GIT_EMAIL: ${{ inputs.git-user }}
           GIT_USER: ${{ inputs.git-email }}
-          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
-          GITHUB_REPO: ${{ github.repository }}
 
       - name: Setup Java
         uses: actions/setup-java@v4.2.1
