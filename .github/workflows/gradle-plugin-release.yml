@@ -41,7 +41,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.6
         with:
-          persist-credentials: false
+          token: ${{ secrets.WORKFLOW_TOKEN }}
 
       - name: Validate Gradle Wrapper
         if: ${{ inputs.run-gradle-validation == true }}
