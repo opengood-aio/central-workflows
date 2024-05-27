@@ -48,12 +48,12 @@ jobs:
           gradle-version: wrapper
 
       - name: Codestyle
-        uses: musichin/ktlint-check@v3
+        uses: musichin/ktlint-check@v3.0.1
         with:
           ktlint-version: 1.2.1
 
       - name: Coverage
-        uses: codecov/codecov-action@v4.4.0
+        uses: codecov/codecov-action@v4.4.1
         with:
           file: ./build/reports/jacoco/test/jacocoTestReport.xml
           verbose: true
