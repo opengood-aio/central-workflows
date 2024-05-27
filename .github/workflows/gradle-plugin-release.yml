@@ -65,5 +65,6 @@ jobs:
           arguments: clean release -PskipTests=true -Prelease.useAutomaticVersion=true
           gradle-version: wrapper
         env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
           GRADLE_PUBLISH_KEY: ${{ secrets.gradle-publish-key }}
           GRADLE_PUBLISH_SECRET: ${{ secrets.gradle-publish-secret }}
