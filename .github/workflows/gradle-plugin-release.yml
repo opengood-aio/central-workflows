@@ -40,6 +40,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.6
+        with:
+          persist-credentials: false
 
       - name: Validate Gradle Wrapper
         if: ${{ inputs.run-gradle-validation == true }}
@@ -49,9 +51,12 @@ jobs:
         run: |
           git config user.email ${GIT_EMAIL}
           git config user.name ${GIT_USER}
+          git remote set-url origin https://x-access-token/:${GITHUB_TOKEN}@github.com/${GITHUB_REPO}
         env:
           GIT_EMAIL: ${{ inputs.git-user }}
           GIT_USER: ${{ inputs.git-email }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+          GITHUB_REPO: ${{ github.repository }}
 
       - name: Setup Java
         uses: actions/setup-java@v4.2.1
