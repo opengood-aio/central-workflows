@@ -25,15 +25,22 @@ on:
         type: boolean
         description: Value indicating if Gradle validation step should run
         required: true
+    secrets:
+      workflow-token:
+        description: GitHub workflow secret for pushing automated commits
+        required: true
 
 jobs:
   gradle-github-release:
     name: Gradle GitHub Release
     runs-on: ubuntu-latest
-    if: ${{ github.event.head_commit.message == 'Create release' }}
+    if: ${{ github.event.label.name == 'release' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.6
+        with:
+          persist-credentials: false
+          token: ${{ secrets.workflow-token }}
 
       - name: Validate Gradle Wrapper
         if: ${{ inputs.run-gradle-validation == true }}
@@ -43,9 +50,10 @@ jobs:
         run: |
           git config user.email ${GIT_EMAIL}
           git config user.name ${GIT_USER}
+          git config url.https://${{ secrets.workflow-token }}@github.com/.insteadOf https://github.com/
         env:
-          GIT_EMAIL: ${{ inputs.git-user }}
-          GIT_USER: ${{ inputs.git-email }}
+          GIT_EMAIL: ${{ inputs.git-email }}
+          GIT_USER: ${{ inputs.git-user }}
 
       - name: Setup Java
         uses: actions/setup-java@v4.2.1
@@ -60,4 +68,4 @@ jobs:
           gradle-version: wrapper
         env:
           GITHUB_USER: ${{ inputs.git-user }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.workflow-token }}

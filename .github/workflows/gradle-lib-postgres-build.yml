@@ -43,7 +43,6 @@ jobs:
   gradle-lib-postgres-build:
     name: Gradle Library with Postgres Build
     runs-on: ubuntu-latest
-    if: ${{ github.event.head_commit.message != 'Create release' }}
 
     services:
       postgres:
