@@ -51,7 +51,6 @@ jobs:
   gradle-app-postgres-build:
     name: Gradle App with Postgres Build
     runs-on: ubuntu-latest
-    if: ${{ github.event.head_commit.message != 'Create release' && !contains(github.event.head_commit.message, 'Deploy') }}
 
     services:
       postgres:

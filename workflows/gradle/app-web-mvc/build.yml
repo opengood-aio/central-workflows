@@ -3,21 +3,14 @@ name: build
 on:
   push:
     branches:
-      - main
+      - '**'
+      - '!main'
     paths-ignore:
-      - .github/workflows/cancel.yml
-      - .github/workflows/clear-packages.yml
-      - .github/workflows/codeql.yml
-      - .github/workflows/deploy-dev.yml
-      - .github/workflows/deploy-prod.yml
-      - .github/workflows/release.yml
+      - .github/workflows/*
       - .gitignore
       - gradle.properties
       - LICENSE
       - README.md
-  pull_request:
-    branches:
-      - main
 
 jobs:
   build:

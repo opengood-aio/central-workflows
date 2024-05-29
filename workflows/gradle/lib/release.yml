@@ -4,9 +4,12 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
+    paths-ignore:
+      - .github/workflows/*
+      - .gitignore
+      - gradle.properties
+      - LICENSE
+      - README.md
 
 jobs:
   release:
@@ -20,3 +23,4 @@ jobs:
       gpg-signing-private-key: ${{ secrets.GPG_SIGNING_PRIVATE_KEY }}
       oss-repo-username: ${{ secrets.OSS_REPO_USERNAME }}
       oss-repo-password: ${{ secrets.OSS_REPO_PASSWORD }}
+      workflow-token: ${{ secrets.WORKFLOW_TOKEN }}
