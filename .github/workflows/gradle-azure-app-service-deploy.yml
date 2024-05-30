@@ -29,7 +29,7 @@ jobs:
   gradle-azure-app-service-deploy:
     name: Gradle Azure App Service Deploy
     runs-on: ubuntu-latest
-    if: ${{ contains(github.event.label.name, format('Deploy {0}', inputs.env)) }}
+    if: ${{ contains(github.event.pull_request.labels.*.name, format('deploy {0}', inputs.env)) && github.event.pull_request.merged == true }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.6
