@@ -26,6 +26,9 @@ on:
         description: Value indicating if Gradle validation step should run
         required: true
     secrets:
+      codecov-token:
+        description: Codecov code coverage token
+        required: false
       fossa-api-key:
         description: FOSSA licensing scan API key
         required: true
@@ -116,6 +119,7 @@ jobs:
         with:
           file: ./build/reports/jacoco/test/jacocoTestReport.xml
           verbose: true
+          token: ${{ secrets.codecov-token }}
 
       - name: FOSSA
         uses: fossas/fossa-action@v1.3.3

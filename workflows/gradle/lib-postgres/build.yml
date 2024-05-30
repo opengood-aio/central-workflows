@@ -20,6 +20,7 @@ jobs:
       postgres-build-db-uri: ${{ vars.POSTGRES_BUILD_DB_URI }}
       run-gradle-validation: true
     secrets:
+      codecov-token: ${{ secrets.CODECOV_TOKEN }}
       fossa-api-key: ${{ secrets.FOSSA_API_KEY }}
       postgres-admin-password: ${{ secrets.POSTGRES_ADMIN_DB_PASSWORD }}
       postgres-build-db-svc-name: ${{ secrets.POSTGRES_BUILD_DB_SVC_NAME }}
