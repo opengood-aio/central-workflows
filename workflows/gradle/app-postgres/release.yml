@@ -1,7 +1,10 @@
 name: release
 
 on:
-  push:
+  pull_request:
+    types:
+      - closed
+      - labeled
     branches:
       - main
     paths-ignore:
@@ -17,7 +20,7 @@ jobs:
     with:
       git-email: ${{ vars.GIT_EMAIL }}
       git-user: ${{ vars.GIT_USER }}
-      java-version: 17
+      java-version: 21
       run-gradle-validation: true
     secrets:
       workflow-token: ${{ secrets.WORKFLOW_TOKEN }}

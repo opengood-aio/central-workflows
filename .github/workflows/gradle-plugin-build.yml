@@ -12,7 +12,7 @@ on:
         type: number
         description: Version of Java JDK to use
         required: false
-        default: 17
+        default: 21
       run-gradle-validation:
         type: boolean
         description: Value indicating if Gradle validation step should run
