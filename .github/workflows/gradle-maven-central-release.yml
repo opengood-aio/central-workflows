@@ -1,4 +1,4 @@
-name: gradle-oss-release
+name: gradle-maven-central-release
 
 on:
   workflow_call:
@@ -26,25 +26,28 @@ on:
         description: Value indicating if Gradle validation step should run
         required: true
     secrets:
+      gpg-signing-key-id:
+        description: GPG signing key identifier for publishing to Maven Central repository
+        required: true
       gpg-signing-password:
-        description: GPG signing password for publishing to OSS repositories
+        description: GPG signing password for publishing to Maven Central repository
         required: true
       gpg-signing-private-key:
-        description: GPG signing private key for publishing to OSS repositories
+        description: GPG signing private key for publishing to Maven Central repository
         required: true
-      oss-repo-username:
-        description: Username for publishing to OSS repositories
+      maven-central-repo-username:
+        description: Username for publishing to Maven Central repository
         required: true
-      oss-repo-password:
-        description: Password for publishing to OSS repositories
+      maven-central-repo-password:
+        description: Password for publishing to Maven Central repository
         required: true
       workflow-token:
         description: GitHub workflow secret for pushing automated commits
         required: true
 
 jobs:
-  gradle-oss-release:
-    name: Gradle OSS Release
+  gradle-maven-central-release:
+    name: Gradle Maven Central Release
     runs-on: ubuntu-latest
     if: ${{ contains(github.event.pull_request.labels.*.name, 'release') && github.event.pull_request.merged == true }}
     steps:
@@ -80,7 +83,8 @@ jobs:
           gradle-version: wrapper
         env:
           GITHUB_TOKEN: ${{ secrets.workflow-token }}
-          GPG_SIGNING_PASSWORD: ${{ secrets.gpg-signing-password }}
-          GPG_SIGNING_PRIVATE_KEY: ${{ secrets.gpg-signing-private-key }}
-          OSS_REPO_USERNAME: ${{ secrets.oss-repo-username }}
-          OSS_REPO_PASSWORD: ${{ secrets.oss-repo-password }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.gpg-signing-key-id }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.gpg-signing-password }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.gpg-signing-private-key }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.maven-central-repo-username }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.maven-central-repo-password }}
