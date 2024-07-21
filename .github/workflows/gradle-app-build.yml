@@ -44,7 +44,7 @@ jobs:
 
       - name: Validate Gradle Wrapper
         if: ${{ inputs.run-gradle-validation == true }}
-        uses: gradle/wrapper-validation-action@v3.4.2
+        uses: gradle/wrapper-validation-action@v3.5.0
 
       - name: Setup Java
         uses: actions/setup-java@v4.2.1
