@@ -22,4 +22,4 @@ jobs:
           committer_username: ${{ vars.GIT_USER }}
           committer_email: ${{ vars.GIT_EMAIL }}
           token: ${{ secrets.WORKFLOW_TOKEN }}
-          ignore: '["dependency-check/Dependency-Check_Action@main", "actions/upload-artifact@master"]'
+          ignore: '["github/codeql-action/init@v3", "github/codeql-action/autobuild@v3", "github/codeql-action/analyze@v3","dependency-check/Dependency-Check_Action@main", "actions/upload-artifact@master"]'
