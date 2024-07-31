@@ -32,22 +32,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.7
-
-      - name: Validate Gradle Wrapper
-        if: ${{ inputs.run-gradle-validation == true }}
-        uses: gradle/wrapper-validation-action@v3.5.0
-
+        
       - name: Setup Java
         uses: actions/setup-java@v4.2.1
         with:
           java-version: ${{ inputs.java-version }}
           distribution: ${{ inputs.java-distribution }}
 
-      - name: Build
-        uses: burrunan/gradle-cache-action@v1
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          arguments: clean build
-          gradle-version: wrapper
+          validate-wrappers: ${{ inputs.run-gradle-validation }}
+          dependency-graph: generate-and-submit
+          dependency-graph-continue-on-failure: true
+
+      - name: Build
+        run: ./gradlew clean build
 
       - name: Codestyle
         uses: musichin/ktlint-check@v3.0.1
