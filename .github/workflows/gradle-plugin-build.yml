@@ -43,8 +43,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           validate-wrappers: ${{ inputs.run-gradle-validation }}
-          dependency-graph: generate-and-submit
-          dependency-graph-continue-on-failure: true
 
       - name: Build
         run: ./gradlew clean build
