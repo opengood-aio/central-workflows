@@ -56,12 +56,6 @@ jobs:
       - name: Build
         run: ./gradlew clean build
 
-      - name: Set Package Name
-        run: |
-          group=$(awk '/group/{print $NF; exit}' build.gradle.kts | sed s/\'//g | sed s/\"//g)
-          name=$(awk '/rootProject.name/{print $NF; exit}' settings.gradle.kts | sed s/\'//g | sed s/\"//g)
-          echo "PACKAGE_NAME=${group}.${name}" >> $GITHUB_ENV
-
       - name: Codestyle
         uses: musichin/ktlint-check@v3.0.1
         with:
