@@ -49,7 +49,7 @@ jobs:
           distribution: ${{ inputs.java-distribution }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v3.5.0
         with:
           validate-wrappers: ${{ inputs.run-gradle-validation }}
 
