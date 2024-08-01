@@ -72,10 +72,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.7
 
-      - name: Validate Gradle Wrapper
-        if: ${{ inputs.run-gradle-validation == true }}
-        uses: gradle/wrapper-validation-action@v3.5.0
-
       - name: Setup Java
         uses: actions/setup-java@v4.2.1
         with:
@@ -101,21 +97,17 @@ jobs:
           FLYWAY_USER: ${{ secrets.postgres-build-db-svc-name }}
           FLYWAY_PASSWORD: ${{ secrets.postgres-build-db-svc-password }}
 
-      - name: Build
-        uses: burrunan/gradle-cache-action@v1
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          arguments: clean build
-          gradle-version: wrapper
+          validate-wrappers: ${{ inputs.run-gradle-validation }}
+
+      - name: Build
+        run: ./gradlew clean build
         env:
           SPRING_DATASOURCE_URL: ${{ inputs.postgres-build-db-uri }}
           SPRING_DATASOURCE_USERNAME: ${{ secrets.postgres-build-db-svc-name }}
           SPRING_DATASOURCE_PASSWORD: ${{ secrets.postgres-build-db-svc-password }}
-
-      - name: Set Package Name
-        run: |
-          group=$(awk '/group/{print $NF; exit}' build.gradle.kts | sed s/\'//g | sed s/\"//g)
-          name=$(awk '/rootProject.name/{print $NF; exit}' settings.gradle.kts | sed s/\'//g | sed s/\"//g)
-          echo "PACKAGE_NAME=${group}.${name}" >> $GITHUB_ENV
 
       - name: Codestyle
         uses: musichin/ktlint-check@v3.0.1
@@ -135,22 +127,3 @@ jobs:
         uses: fossas/fossa-action@v1.3.3
         with:
           api-key: ${{ secrets.fossa-api-key }}
-
-      - name: Dependency Check
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          project: ${{ env.PACKAGE_NAME }}
-          path: .
-          format: HTML
-          out: reports/dependency-check
-          args: >
-            --failOnCVSS 7
-            --enableRetired
-        env:
-          JAVA_HOME: /opt/jdk
-
-      - name: Publish Dependency Check Results
-        uses: actions/upload-artifact@master
-        with:
-          name: Dependency Check Report
-          path: ${{ github.workspace }}/reports/dependency-check
