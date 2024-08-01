@@ -1,0 +1,32 @@
+name: gradle-dependencies-submit
+
+on:
+  workflow_call:
+    inputs:
+      java-distribution:
+        type: string
+        description: Name of Java JDK distribution to use
+        required: false
+        default: temurin
+      java-version:
+        type: number
+        description: Version of Java JDK to use
+        required: false
+        default: 21
+
+jobs:
+  gradle-dependencies-submit:
+    name: Gradle Dependencies Submit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.7
+        
+      - name: Setup Java
+        uses: actions/setup-java@v4.2.1
+        with:
+          java-version: ${{ inputs.java-version }}
+          distribution: ${{ inputs.java-distribution }}
+
+      - name: Gradle Dependencies Submission
+        uses: gradle/actions/dependency-submission@v3
