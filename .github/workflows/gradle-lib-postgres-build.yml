@@ -65,7 +65,7 @@ jobs:
         uses: actions/checkout@v4.1.7
 
       - name: Setup Java
-        uses: actions/setup-java@v4.2.1
+        uses: actions/setup-java@v4.2.2
         with:
           java-version: ${{ inputs.java-version }}
           distribution: ${{ inputs.java-distribution }}
@@ -90,7 +90,7 @@ jobs:
           FLYWAY_PASSWORD: ${{ secrets.postgres-build-db-svc-password }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3.5.0
+        uses: gradle/actions/setup-gradle@v4.0.0
         with:
           validate-wrappers: ${{ inputs.run-gradle-validation }}
 
@@ -114,6 +114,6 @@ jobs:
           token: ${{ secrets.codecov-token }}
 
       - name: FOSSA
-        uses: fossas/fossa-action@v1.3.3
+        uses: fossas/fossa-action@v1.4.0
         with:
           api-key: ${{ secrets.fossa-api-key }}
