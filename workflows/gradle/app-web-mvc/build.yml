@@ -18,5 +18,4 @@ jobs:
     with:
       java-version: 21
       run-coverage: false
-      run-fossa: false
       run-gradle-validation: true

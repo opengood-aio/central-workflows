@@ -29,9 +29,6 @@ on:
       codecov-token:
         description: Codecov code coverage token
         required: false
-      fossa-api-key:
-        description: FOSSA licensing scan API key
-        required: true
       postgres-admin-password:
         description: Postgres admin password
         required: true
@@ -112,8 +109,3 @@ jobs:
           file: ./build/reports/jacoco/test/jacocoTestReport.xml
           verbose: true
           token: ${{ secrets.codecov-token }}
-
-      - name: FOSSA
-        uses: fossas/fossa-action@v1.4.0
-        with:
-          api-key: ${{ secrets.fossa-api-key }}

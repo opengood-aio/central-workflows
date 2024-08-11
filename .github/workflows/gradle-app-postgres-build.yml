@@ -25,10 +25,6 @@ on:
         type: boolean
         description: Value indicating if coverage step should run
         required: true
-      run-fossa:
-        type: boolean
-        description: Value indicating if FOSSA step should run
-        required: true
       run-gradle-validation:
         type: boolean
         description: Value indicating if Gradle validation step should run
@@ -36,9 +32,6 @@ on:
     secrets:
       codecov-token:
         description: Codecov code coverage token
-        required: false
-      fossa-api-key:
-        description: FOSSA licensing scan API key
         required: false
       postgres-admin-password:
         description: Postgres admin password
@@ -121,9 +114,3 @@ jobs:
           file: ./build/reports/jacoco/test/jacocoTestReport.xml
           verbose: true
           token: ${{ secrets.codecov-token }}
-
-      - name: FOSSA
-        if: ${{ inputs.run-fossa == 'true' }}
-        uses: fossas/fossa-action@v1.4.0
-        with:
-          api-key: ${{ secrets.fossa-api-key }}

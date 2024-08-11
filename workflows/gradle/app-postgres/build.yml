@@ -20,7 +20,6 @@ jobs:
       postgres-admin-db-uri: ${{ vars.POSTGRES_ADMIN_DB_URI }}
       postgres-build-db-uri: ${{ vars.POSTGRES_BUILD_DB_URI }}
       run-coverage: false
-      run-fossa: false
       run-gradle-validation: true
     secrets:
       postgres-admin-password: ${{ secrets.POSTGRES_ADMIN_DB_PASSWORD }}
