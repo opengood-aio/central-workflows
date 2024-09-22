@@ -52,7 +52,7 @@ jobs:
           LABEL: ${{ github.event.label.name }}
 
       - name: Azure Login
-        uses: azure/login@v2.1.1
+        uses: azure/login@v2.2.0
         with:
           creds: ${{ secrets.azure-app-credentials }}
 
