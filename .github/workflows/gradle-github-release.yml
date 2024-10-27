@@ -37,7 +37,7 @@ jobs:
     if: ${{ contains(github.event.pull_request.labels.*.name, 'release') && github.event.pull_request.merged == true }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.2.1
+        uses: actions/checkout@v4.2.2
         with:
           persist-credentials: false
           token: ${{ secrets.workflow-token }}
@@ -52,7 +52,7 @@ jobs:
           GIT_USER: ${{ inputs.git-user }}
 
       - name: Setup Java
-        uses: actions/setup-java@v4.4.0
+        uses: actions/setup-java@v4.5.0
         with:
           java-version: ${{ inputs.java-version }}
           distribution: ${{ inputs.java-distribution }}
