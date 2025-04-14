@@ -1,4 +1,5 @@
 name: local-update-license-copyright
+
 on:
   workflow_dispatch:
   schedule:
