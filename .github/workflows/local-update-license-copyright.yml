@@ -1,4 +1,4 @@
-name: update-license-copyright
+name: local-update-license-copyright
 on:
   workflow_dispatch:
   schedule:
@@ -6,7 +6,7 @@ on:
     - cron: '0 0 * * 0'
 
 jobs:
-  update-license-copyright:
+  local-update-license-copyright:
     uses: opengood-aio/central-workflows/.github/workflows/workflow-update-license-copyright.yml@main
     secrets:
       workflow-token: ${{ secrets.WORKFLOW_TOKEN }}

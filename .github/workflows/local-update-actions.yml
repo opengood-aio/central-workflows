@@ -1,4 +1,4 @@
-name: workflow-update-actions
+name: local-update-actions
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
     - cron: '0 0 * * 0'
 
 jobs:
-  workflow-update-actions:
+  local-update-actions:
     name: Workflow Update Actions
     runs-on: ubuntu-latest
     steps:
