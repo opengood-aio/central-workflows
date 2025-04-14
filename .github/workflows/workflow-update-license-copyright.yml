@@ -1,0 +1,23 @@
+name: workflow-update-license-copyright
+
+on:
+  workflow_call:
+    secrets:
+      workflow-token:
+        description: GitHub workflow secret for pushing automated commits
+        required: true
+
+jobs:
+  workflow-update-license-copyright:
+    name: Workflow Update License Copyright
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        with:
+          token: ${{ secrets.workflow-token }}
+
+      - name: Update Workflow License Copy
+        uses: FantasticFiasco/action-update-license-year@v3
+        with:
+          token: ${{ secrets.workflow-token }}
