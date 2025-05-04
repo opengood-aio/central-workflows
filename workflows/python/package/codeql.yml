@@ -10,12 +10,11 @@ on:
     paths-ignore:
       - .github/workflows/*
       - .gitignore
-      - gradle.properties
       - LICENSE
       - README.md
 
 jobs:
   build:
-    uses: opengood-aio/central-workflows/.github/workflows/java-codeql-analyze.yml@main
+    uses: opengood-aio/central-workflows/.github/workflows/python-codeql-analyze.yml@main
     with:
-      java-version: 21
+      python-version: 3.13
