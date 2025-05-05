@@ -38,7 +38,7 @@ jobs:
       - name: Test
         run: |
           pip install pytest pytest-cov
-          python -m pytest tests/ --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+          python -m pytest tests/ --doctest-modules --junitxml=pytest/test-results.xml --cov=com --cov-report=xml --cov-report=html
 
       - name: Install Ruff
         run: pipx install ruff
@@ -53,6 +53,6 @@ jobs:
       - name: Coverage
         uses: codecov/codecov-action@v5.4.0
         with:
-          file: junit/test-results.xml
+          files: pytest/test-results.xml
           verbose: true
           token: ${{ secrets.codecov-token }}

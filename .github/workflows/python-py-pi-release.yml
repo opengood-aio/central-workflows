@@ -1,0 +1,105 @@
+name: python-py-pi-release
+
+on:
+  workflow_call:
+    inputs:
+      git-email:
+        type: string
+        description: Git user email address
+        required: true
+      git-user:
+        type: string
+        description: Git user username
+        required: true
+      python-version:
+        type: number
+        description: Version of Python to use
+        required: false
+        default: 3.13
+    secrets:
+      workflow-token:
+        description: GitHub workflow secret for pushing automated commits
+        required: true
+
+jobs:
+  python-py-pi-release:
+    name: Python PyPI Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'release') && github.event.pull_request.merged == true }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        with:
+          persist-credentials: false
+          token: ${{ secrets.workflow-token }}
+
+      - name: Setup Git
+        run: |
+          git config user.email ${GIT_EMAIL}
+          git config user.name ${GIT_USER}
+          git config url.https://${{ secrets.workflow-token }}@github.com/.insteadOf https://github.com/
+        env:
+          GIT_EMAIL: ${{ inputs.git-email }}
+          GIT_USER: ${{ inputs.git-user }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: 'pip'
+
+      - name: Display Python Version
+        run: python -c "import sys; print(sys.version)"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Build
+        run: pip install build --user
+
+      - name: Build Binary Wheel and Source Tarball
+        run: python -m build
+
+      - name: Store Distribution Packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Download Distribution Packages
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Sign Distribution Packages
+        uses: sigstore/gh-action-sigstore-python@v3.0.0
+        with:
+          inputs: >-
+            ./dist/*.tar.gz
+            ./dist/*.whl
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.workflow-token }}
+        run: >-
+          gh release create
+          "$GITHUB_REF_NAME"
+          --repo "$GITHUB_REPOSITORY"
+          --notes ""
+
+      - name: Upload Artifact Signatures to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.workflow-token }}
+        run: >-
+          gh release upload
+          "$GITHUB_REF_NAME" dist/**
+          --repo "$GITHUB_REPOSITORY"
+
+      - name: Publish Distribution Package
+        uses: pypa/gh-action-pypi-publish@release/v1
