@@ -11,12 +11,19 @@ on:
         type: string
         description: Git user username
         required: true
+      git-name:
+        type: string
+        description: Git name
+        required: true
       python-version:
         type: number
         description: Version of Python to use
         required: false
         default: 3.13
     secrets:
+      py-pi-token:
+        description: Py PI token for publishing packages
+        required: true
       workflow-token:
         description: GitHub workflow secret for pushing automated commits
         required: true
@@ -62,6 +69,19 @@ jobs:
       - name: Install Build
         run: pip install build --user
 
+      - name: Get Current Version
+        run: echo "CURRENT_VERSION=$(grep 'version' pyproject.toml | cut -d ' ' -f3)" >> $GITHUB_ENV
+
+      - name: Set Release Version
+        uses: FragileTech/bump-version@v1.0.4
+        with:
+          current_version: ${{ env.CURRENT_VERSION }}
+          files: pyproject.toml
+          commit_name: ${{ inputs.git-name }}
+          commit_email: ${{ inputs.git-email }}
+          login: ${{ inputs.git-user }}
+          token: ${{ secrets.workflow_token }}
+
       - name: Build Binary Wheel and Source Tarball
         run: python -m build
 
@@ -84,15 +104,6 @@ jobs:
             ./dist/*.tar.gz
             ./dist/*.whl
 
-      - name: Create GitHub Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.workflow-token }}
-        run: >-
-          gh release create
-          "$GITHUB_REF_NAME"
-          --repo "$GITHUB_REPOSITORY"
-          --notes ""
-
       - name: Upload Artifact Signatures to GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.workflow-token }}
@@ -103,3 +114,17 @@ jobs:
 
       - name: Publish Distribution Package
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.py-pi-token }}
+
+      - name: Create GitHub Release
+        env:
+          RELEASE_NOTES: ${{ github.event.pull_request.body }}
+          GITHUB_TOKEN: ${{ secrets.workflow-token }}
+        run: >-
+          CLEAN_RELEASE_NOTES=$(echo RELEASE_NOTES | sed 's/["'\''`]/ /g')
+          echo "CLEAN_RELEASE_NOTES=CLEAN_RELEASE_NOTES" >> $GITHUB_ENV
+          gh release create
+          "$GITHUB_REF_NAME"
+          --repo "$GITHUB_REPOSITORY"
+          --notes "$CLEAN_RELEASE_NOTES"
