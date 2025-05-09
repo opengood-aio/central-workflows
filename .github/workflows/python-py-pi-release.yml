@@ -13,7 +13,7 @@ on:
         required: true
       git-name:
         type: string
-        description: Git name
+        description: Git user name
         required: true
       python-version:
         type: number
@@ -23,6 +23,9 @@ on:
     secrets:
       py-pi-token:
         description: Py PI token for publishing packages
+        required: true
+      codecov-token:
+        description: Codecov code coverage token
         required: true
       workflow-token:
         description: GitHub workflow secret for pushing automated commits
@@ -69,18 +72,21 @@ jobs:
       - name: Install Build
         run: pip install build --user
 
-      - name: Get Current Version
-        run: echo "CURRENT_VERSION=$(grep 'version' pyproject.toml | cut -d ' ' -f3)" >> $GITHUB_ENV
+      - name: Get Dev Version
+        run: echo "DEV_VERSION=$(grep 'version' pyproject.toml | sed -n 's/.*"\(.*\)".*/\1/p')" >> $GITHUB_ENV
 
-      - name: Set Release Version
+      - name: Set Release Version and Tag
         uses: FragileTech/bump-version@v1.0.4
         with:
-          current_version: ${{ env.CURRENT_VERSION }}
+          current_version: ${{ env.DEV_VERSION }}
           files: pyproject.toml
           commit_name: ${{ inputs.git-name }}
           commit_email: ${{ inputs.git-email }}
           login: ${{ inputs.git-user }}
           token: ${{ secrets.workflow_token }}
+
+      - name: Get Release Version
+        run: echo "RELEASE_VERSION=$(grep 'version' pyproject.toml | sed -n 's/.*"\(.*\)".*/\1/p')" >> $GITHUB_ENV
 
       - name: Build Binary Wheel and Source Tarball
         run: python -m build
@@ -125,6 +131,20 @@ jobs:
           CLEAN_RELEASE_NOTES=$(echo RELEASE_NOTES | sed 's/["'\''`]/ /g')
           echo "CLEAN_RELEASE_NOTES=CLEAN_RELEASE_NOTES" >> $GITHUB_ENV
           gh release create
-          "$GITHUB_REF_NAME"
+          "$RELEASE_VERSION"
           --repo "$GITHUB_REPOSITORY"
+          --title "$GITHUB_REF_NAME"
           --notes "$CLEAN_RELEASE_NOTES"
+
+      - name: Download Coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage
+          path: ./coverage.xml
+
+      - name: Coverage
+        uses: codecov/codecov-action@v5.4.0
+        with:
+          files: ./coverage.xml
+          verbose: true
+          token: ${{ secrets.codecov-token }}

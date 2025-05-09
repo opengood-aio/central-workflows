@@ -11,7 +11,7 @@ on:
     secrets:
       codecov-token:
         description: Codecov code coverage token
-        required: false
+        required: true
 
 jobs:
   python-package-build:
