@@ -37,8 +37,8 @@ jobs:
 
       - name: Test
         run: |
-          pip install pytest-cov
-          python -m pytest tests/ --junitxml=pytest/test-results.xml
+          pip install pytest pytest-cov
+          python -m pytest --cov-config=pyproject.toml
 
       - name: Install Ruff
         run: pipx install ruff
@@ -53,7 +53,7 @@ jobs:
       - name: Coverage
         uses: codecov/codecov-action@v5.4.0
         with:
-          files: pytest/test-results.xml
+          files: ./coverage.xml
           verbose: true
           token: ${{ secrets.codecov-token }}
 
@@ -61,4 +61,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage
-          path: pytest/
+          path: ./coverage.xml
