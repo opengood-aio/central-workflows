@@ -1,4 +1,4 @@
-name: CodeQL
+name: dependencies-submit
 
 on:
   pull_request:
@@ -10,12 +10,9 @@ on:
     paths-ignore:
       - .github/workflows/*
       - .gitignore
-      - gradle.properties
       - LICENSE
       - README.md
 
 jobs:
-  build:
-    uses: opengood-aio/central-workflows/.github/workflows/java-codeql-analyze.yml@main
-    with:
-      java-version: 21
+  dependencies-submit:
+    uses: opengood-aio/central-workflows/.github/workflows/python-dependencies-submit.yml@python
