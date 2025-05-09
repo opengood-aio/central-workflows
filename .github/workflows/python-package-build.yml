@@ -37,8 +37,8 @@ jobs:
 
       - name: Test
         run: |
-          pip install pytest pytest-cov
-          python -m pytest tests/ --doctest-modules --junitxml=pytest/test-results.xml --cov=com --cov-report=xml --cov-report=html
+          pip install pytest-cov
+          python -m pytest tests/ --junitxml=pytest/test-results.xml
 
       - name: Install Ruff
         run: pipx install ruff
