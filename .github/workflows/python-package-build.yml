@@ -56,3 +56,9 @@ jobs:
           files: pytest/test-results.xml
           verbose: true
           token: ${{ secrets.codecov-token }}
+
+      - name: Upload Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: pytest/

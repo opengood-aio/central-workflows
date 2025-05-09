@@ -65,7 +65,7 @@ jobs:
       - name: Build Binary Wheel and Source Tarball
         run: python -m build
 
-      - name: Store Distribution Packages
+      - name: Upload Distribution Packages
         uses: actions/upload-artifact@v4
         with:
           name: python-package-distributions
