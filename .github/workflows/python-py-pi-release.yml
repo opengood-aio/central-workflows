@@ -11,15 +11,16 @@ on:
         type: string
         description: Git user username
         required: true
-      git-name:
-        type: string
-        description: Git user name
-        required: true
       python-version:
         type: number
         description: Version of Python to use
         required: false
         default: 3.13
+      bump-part:
+        type: string
+        description: Part of semantic version number to bump
+        required: false
+        default: minor
     secrets:
       py-pi-token:
         description: Py PI token for publishing packages
@@ -76,17 +77,20 @@ jobs:
         run: echo "DEV_VERSION=$(grep 'version' pyproject.toml | sed -n 's/.*"\(.*\)".*/\1/p')" >> $GITHUB_ENV
 
       - name: Set Release Version and Tag
-        uses: FragileTech/bump-version@v1.0.4
+        uses: callowayproject/bump-my-version@master
+        env:
+          BUMPVERSION_TAG: true
         with:
-          current_version: ${{ env.DEV_VERSION }}
-          files: pyproject.toml
-          commit_name: ${{ inputs.git-name }}
-          commit_email: ${{ inputs.git-email }}
-          login: ${{ inputs.git-user }}
-          token: ${{ secrets.workflow_token }}
+          args: ${{ inputs.bump-part }}
+          github-token: ${{ secrets.workflow_token }}
+
+      - name: Validate Release Version
+        if: ${{ steps.bump.outputs.bumped == true }}
+        run: |
+          echo "Dev version bumped from ${{ steps.bump.outputs.previous-version }} to release version ${{ steps.bump.outputs.current-version }}!"
 
       - name: Get Release Version
-        run: echo "RELEASE_VERSION=$(grep 'version' pyproject.toml | sed -n 's/.*"\(.*\)".*/\1/p')" >> $GITHUB_ENV
+        run: echo "RELEASE_VERSION=${{ steps.bump.outputs.current-version }}" >> $GITHUB_ENV
 
       - name: Build Binary Wheel and Source Tarball
         run: python -m build
