@@ -73,9 +73,6 @@ jobs:
       - name: Install Build
         run: pip install build --user
 
-      - name: Get Dev Version
-        run: echo "DEV_VERSION=$(grep 'version' pyproject.toml | sed -n 's/.*"\(.*\)".*/\1/p')" >> $GITHUB_ENV
-
       - name: Set Release Version and Tag
         uses: callowayproject/bump-my-version@master
         env:
