@@ -22,9 +22,6 @@ on:
         required: false
         default: minor
     secrets:
-      github-gpg-signing-id:
-        description: GPG signing key identifier for signing commits and pusing to GitHub
-        required: true
       py-pi-token:
         description: Py PI token for publishing packages
         required: true
@@ -54,14 +51,11 @@ jobs:
         run: |
           git config user.email ${GIT_EMAIL}
           git config user.name ${GIT_USER}
-          git config url.https://$WORKFLOW_TOKEN@github.com/.insteadOf https://github.com/
-          git config commit.gpgsign true
-          git config --global user.signingkey "$GH_GPG_SIGNING_KEY_ID"
+          git config url.https://$GITHUB_TOKEN@github.com/.insteadOf https://github.com/
         env:
+          GITHUB_TOKEN: ${{ secrets.workflow-token }}
           GIT_EMAIL: ${{ inputs.git-email }}
           GIT_USER: ${{ inputs.git-user }}
-          GH_GPG_SIGNING_KEY_ID: ${{ secrets.github-gpg-signing-id }}
-          WORKFLOW_TOKEN: ${{ secrets.workflow-token }}
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -84,6 +78,7 @@ jobs:
         uses: callowayproject/bump-my-version@master
         env:
           BUMPVERSION_TAG: true
+          GITHUB_TOKEN: ${{ secrets.workflow-token }}
         with:
           args: ${{ inputs.bump-part }}
           github-token: ${{ secrets.workflow_token }}
