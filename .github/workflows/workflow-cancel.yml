@@ -17,4 +17,4 @@ jobs:
         uses: styfle/cancel-workflow-action@0.12.1
         with:
           workflow_id: 'build.yml,codeql.yml,deploy-dev.yml,deploy-prod.yml,release.yml'
-          access_token: ${{ secrets.GITHUB_TOKEN }}
+          access_token: ${{ secrets.WORKFLOW_TOKEN }}

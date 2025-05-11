@@ -78,6 +78,7 @@ jobs:
         uses: callowayproject/bump-my-version@master
         env:
           BUMPVERSION_TAG: true
+          GITHUB_TOKEN: ${{ secrets.workflow-token }}
         with:
           args: ${{ inputs.bump-part }}
           github-token: ${{ secrets.workflow_token }}
