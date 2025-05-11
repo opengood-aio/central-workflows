@@ -53,7 +53,7 @@ jobs:
           GIT_USER: ${{ inputs.git-user }}
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5.6.0
         with:
           python-version: ${{ inputs.python-version }}
           cache: 'pip'
@@ -86,13 +86,13 @@ jobs:
         run: python -m build
 
       - name: Upload Distribution Packages
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: python-package-distributions
           path: dist/
 
       - name: Download Distribution Packages
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v4.3.0
         with:
           name: python-package-distributions
           path: dist/
@@ -113,7 +113,7 @@ jobs:
           --repo "$GITHUB_REPOSITORY"
 
       - name: Publish Distribution Package
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@v1.12.4
         with:
           password: ${{ secrets.py-pi-token }}
 
