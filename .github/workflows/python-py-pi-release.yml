@@ -91,7 +91,7 @@ jobs:
 
       - name: Set Next Project Version
         run: |
-          sed -i 's/^\s*version = ".*"/version = "$RELEASE_VERSION"/' pyproject.toml
+          sed -i "s/^\s*version = \".*\"/version = \"$RELEASE_VERSION\"/" pyproject.toml
           git add pyproject.toml
           git commit -m "Update next Python project version from $RELEASE_VERSION to $NEXT_DEV_VERSION"
 
