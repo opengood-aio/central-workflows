@@ -35,9 +35,6 @@ on:
       workflow-token:
         description: GitHub workflow token for pushing automated commits
         required: true
-      GITHUB_TOKEN:
-        description: GitHub action token for pushing automated commits
-        required: true
 
 jobs:
   python-py-pi-release:
@@ -88,7 +85,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           args: ${{ inputs.bump-part }}
-          github-token: ${{ secrets.workflow_token }}
+          github-token: ${{ secrets.workflow-token }}
 
       - name: Validate Release Version
         if: ${{ steps.bump.outputs.bumped == true }}
