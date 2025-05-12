@@ -75,10 +75,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Install Build
-        run: pip install build --user
-
       - name: Set Release Version and Tag
+        id: set_release_and_tag
         uses: callowayproject/bump-my-version@master
         env:
           BUMPVERSION_TAG: true
@@ -88,12 +86,15 @@ jobs:
           github-token: ${{ secrets.workflow-token }}
 
       - name: Validate Release Version
-        if: ${{ steps.bump.outputs.bumped == true }}
+        if: ${{ steps.set_release_and_tag.outputs.bumped == true }}
         run: |
-          echo "Dev version bumped from ${{ steps.bump.outputs.previous-version }} to release version ${{ steps.bump.outputs.current-version }}!"
+          echo "Dev version bumped from ${{ steps.set_release_and_tag.outputs.previous-version }} to release version ${{ steps.bump.outputs.current-version }}!"
 
       - name: Get Release Version
-        run: echo "RELEASE_VERSION=${{ steps.bump.outputs.current-version }}" >> $GITHUB_ENV
+        run: echo "RELEASE_VERSION=${{ steps.set_release_and_tag.outputs.current-version }}" >> $GITHUB_ENV
+
+      - name: Install Build
+        run: python -m pip install build --user
 
       - name: Build Binary Wheel and Source Tarball
         run: python -m build
