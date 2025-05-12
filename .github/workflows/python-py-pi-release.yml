@@ -40,6 +40,9 @@ jobs:
   python-py-pi-release:
     name: Python PyPI Release
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/${{ github.event.repository.name }}
     permissions:
       contents: write
       id-token: write
@@ -103,8 +106,6 @@ jobs:
 
       - name: Publish Distribution Package
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.py-pi-token }}
 
       - name: Set Release Version and Tag
         id: set_release_and_tag
