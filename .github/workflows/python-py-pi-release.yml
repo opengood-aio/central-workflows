@@ -40,8 +40,12 @@ jobs:
   python-py-pi-release:
     name: Python PyPI Release
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/${{ github.event.repository.name }}
     permissions:
       contents: write
+      id-token: write
     if: ${{ contains(github.event.pull_request.labels.*.name, 'release') && github.event.pull_request.merged == true }}
     steps:
       - name: Checkout
