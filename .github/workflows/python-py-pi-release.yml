@@ -84,6 +84,12 @@ jobs:
           args: ${{ inputs.bump-part }}
           github-token: ${{ secrets.workflow-token }}
 
+      - name: Push Release Versiob
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.workflow-token }}
+          branch: ${{ github.ref }}
+
       - name: Get Release Version
         run: |
           echo "RELEASE_VERSION=${{ steps.set_release_and_tag.outputs.previous-version }}" >> $GITHUB_ENV
@@ -91,7 +97,6 @@ jobs:
 
       - name: Set Next Project Version
         run: |
-          git push
           sed -i "s/^\s*version = \".*\"/version = \"$RELEASE_VERSION\"/" pyproject.toml
           git add pyproject.toml
           git commit -m "Update next Python project version from $RELEASE_VERSION to $NEXT_DEV_VERSION"
