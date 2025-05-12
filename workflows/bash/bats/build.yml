@@ -8,7 +8,6 @@ on:
     paths-ignore:
       - .github/workflows/*
       - .gitignore
-      - gradle.properties
       - LICENSE
       - README.md
 

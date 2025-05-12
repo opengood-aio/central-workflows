@@ -21,15 +21,22 @@ on:
         description: Part of semantic version number to bump
         required: false
         default: minor
-    secrets:
-      py-pi-token:
-        description: Py PI token for publishing packages
+      run-code-coverage:
+        type: boolean
+        description: Value indicating if code coverage step should run
         required: true
+    secrets:
       codecov-token:
         description: Codecov code coverage token
         required: true
+      py-pi-token:
+        description: Py PI token for publishing Python packages to Python Package Index
+        required: true
       workflow-token:
-        description: GitHub workflow secret for pushing automated commits
+        description: GitHub workflow token for pushing automated commits
+        required: true
+      GITHUB_TOKEN:
+        description: GitHub action token for pushing automated commits
         required: true
 
 jobs:
@@ -53,9 +60,9 @@ jobs:
           git config user.name ${GIT_USER}
           git config url.https://$GITHUB_TOKEN@github.com/.insteadOf https://github.com/
         env:
-          GITHUB_TOKEN: ${{ secrets.workflow-token }}
           GIT_EMAIL: ${{ inputs.git-email }}
           GIT_USER: ${{ inputs.git-user }}
+          GITHUB_TOKEN: ${{ secrets.workflow-token }}
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -78,7 +85,7 @@ jobs:
         uses: callowayproject/bump-my-version@master
         env:
           BUMPVERSION_TAG: true
-          GITHUB_TOKEN: ${{ secrets.workflow-token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           args: ${{ inputs.bump-part }}
           github-token: ${{ secrets.workflow_token }}
@@ -113,6 +120,11 @@ jobs:
             ./dist/*.tar.gz
             ./dist/*.whl
 
+      - name: Publish Distribution Package
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.py-pi-token }}
+
       - name: Upload Artifact Signatures to GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.workflow-token }}
@@ -120,11 +132,6 @@ jobs:
           gh release upload
           "$GITHUB_REF_NAME" dist/**
           --repo "$GITHUB_REPOSITORY"
-
-      - name: Publish Distribution Package
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.py-pi-token }}
 
       - name: Create GitHub Release
         env:
@@ -140,12 +147,14 @@ jobs:
           --notes "$CLEAN_RELEASE_NOTES"
 
       - name: Download Coverage
+        if: ${{ inputs.run-code-coverage == 'true' }}
         uses: actions/download-artifact@v4
         with:
           name: coverage
           path: ./coverage.xml
 
       - name: Coverage
+        if: ${{ inputs.run-code-coverage == 'true' }}
         uses: codecov/codecov-action@v5.4.0
         with:
           files: ./coverage.xml

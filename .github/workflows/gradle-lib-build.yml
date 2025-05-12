@@ -13,6 +13,10 @@ on:
         description: Version of Java JDK to use
         required: false
         default: 21
+      run-code-coverage:
+        type: boolean
+        description: Value indicating if code coverage step should run
+        required: true
       run-gradle-validation:
         type: boolean
         description: Value indicating if Gradle validation step should run
@@ -33,8 +37,8 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4.7.1
         with:
-          java-version: ${{ inputs.java-version }}
           distribution: ${{ inputs.java-distribution }}
+          java-version: ${{ inputs.java-version }}
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4.3.1
@@ -50,6 +54,7 @@ jobs:
           ktlint-version: 1.2.1
 
       - name: Coverage
+        if: ${{ inputs.run-code-coverage == 'true' }}
         uses: codecov/codecov-action@v5.4.0
         with:
           files: ./build/reports/jacoco/test/jacocoTestReport.xml

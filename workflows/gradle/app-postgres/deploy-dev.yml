@@ -6,14 +6,15 @@ on:
       - closed
       - labeled
     branches:
-      - main
+      - dev
 
 jobs:
   deploy-dev:
     uses: opengood-aio/central-workflows/.github/workflows/gradle-azure-app-service-deploy.yml@main
     with:
-      env: dev
+      azure-env: dev
       azure-app-name: ${{ vars.AZURE_APP_NAME_DEV }}
+      github-maven-package-base-uri: ${{ vars.GH_MAVEN_PACKAGE_BASE_URI }}
     secrets:
       azure-app-credentials: ${{ secrets.AZURE_CREDENTIALS_DEV }}
       azure-app-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_DEV }}

@@ -21,9 +21,9 @@ on:
         type: string
         description: Postgres database connection URI for performing builds
         required: true
-      run-coverage:
+      run-code-coverage:
         type: boolean
-        description: Value indicating if coverage step should run
+        description: Value indicating if code coverage step should run
         required: true
       run-gradle-validation:
         type: boolean
@@ -68,8 +68,8 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4.7.1
         with:
-          java-version: ${{ inputs.java-version }}
           distribution: ${{ inputs.java-distribution }}
+          java-version: ${{ inputs.java-version }}
 
       - name: Create Postgres Database and Service Account
         run: |
@@ -108,7 +108,7 @@ jobs:
           ktlint-version: 1.2.1
 
       - name: Coverage
-        if: ${{ inputs.run-coverage == 'true' }}
+        if: ${{ inputs.run-code-coverage == 'true' }}
         uses: codecov/codecov-action@v5.4.0
         with:
           files: ./build/reports/jacoco/test/jacocoTestReport.xml

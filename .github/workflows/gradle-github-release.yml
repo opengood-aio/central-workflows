@@ -21,13 +21,20 @@ on:
         description: Version of Java JDK to use
         required: false
         default: 21
+      run-code-coverage:
+        type: boolean
+        description: Value indicating if code coverage step should run
+        required: true
       run-gradle-validation:
         type: boolean
         description: Value indicating if Gradle validation step should run
         required: true
     secrets:
+      codecov-token:
+        description: Codecov code coverage token
+        required: false
       workflow-token:
-        description: GitHub workflow secret for pushing automated commits
+        description: GitHub workflow token for pushing automated commits
         required: true
 
 jobs:
@@ -48,15 +55,15 @@ jobs:
           git config user.name ${GIT_USER}
           git config url.https://$GITHUB_TOKEN@github.com/.insteadOf https://github.com/
         env:
-          GITHUB_TOKEN: ${{ secrets.workflow-token }}
           GIT_EMAIL: ${{ inputs.git-email }}
           GIT_USER: ${{ inputs.git-user }}
+          GITHUB_TOKEN: ${{ secrets.workflow-token }}
 
       - name: Setup Java
         uses: actions/setup-java@v4.7.1
         with:
-          java-version: ${{ inputs.java-version }}
           distribution: ${{ inputs.java-distribution }}
+          java-version: ${{ inputs.java-version }}
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4.3.1

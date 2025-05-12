@@ -8,10 +8,14 @@ on:
         description: Version of Python to use
         required: false
         default: 3.13
+      run-code-coverage:
+        type: boolean
+        description: Value indicating if code coverage step should run
+        required: true
     secrets:
       codecov-token:
         description: Codecov code coverage token
-        required: true
+        required: false
 
 jobs:
   python-package-build:
@@ -35,7 +39,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Test
+      - name: Build
         run: |
           pip install pytest pytest-cov
           python -m pytest --cov-config=pyproject.toml
@@ -51,6 +55,7 @@ jobs:
         continue-on-error: false
 
       - name: Coverage
+        if: ${{ inputs.run-code-coverage == 'true' }}
         uses: codecov/codecov-action@v5.4.0
         with:
           files: ./coverage.xml
@@ -58,6 +63,7 @@ jobs:
           token: ${{ secrets.codecov-token }}
 
       - name: Upload Coverage
+        if: ${{ inputs.run-code-coverage == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: coverage

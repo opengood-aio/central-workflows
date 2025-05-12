@@ -4,7 +4,7 @@ on:
   workflow_call:
     secrets:
       workflow-token:
-        description: GitHub workflow secret for pushing automated commits
+        description: GitHub workflow token for pushing automated commits
         required: true
 
 jobs:

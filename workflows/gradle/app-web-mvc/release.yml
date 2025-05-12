@@ -20,7 +20,8 @@ jobs:
     with:
       git-email: ${{ vars.GIT_EMAIL }}
       git-user: ${{ vars.GIT_USER }}
-      java-version: 21
+      run-code-coverage: true
       run-gradle-validation: true
     secrets:
+      codecov-token: ${{ secrets.CODECOV_TOKEN }}
       workflow-token: ${{ secrets.WORKFLOW_TOKEN }}
