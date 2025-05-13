@@ -128,20 +128,13 @@ jobs:
           github_token: ${{ secrets.workflow-token }}
           branch: ${{ github.ref }}
 
-      - name: Prepare GitHub Release
-        env:
-          RELEASE_NOTES: ${{ github.event.pull_request.body }}
-        run: >-
-          CLEAN_RELEASE_NOTES=$(echo $RELEASE_NOTES | sed 's/["'\''`]/ /g')
-          echo "CLEAN_RELEASE_NOTES=$CLEAN_RELEASE_NOTES" >> $GITHUB_ENV
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.GITHUB_REF_NAME }}
+          tag_name: ${{ env.RELEASE_VERSION }}
           files: dist/**
-          name: ${{ env.GITHUB_REF_NAME }}
-          body: ${{ env.CLEAN_RELEASE_NOTES }}
+          name: ${{ env.RELEASE_VERSION }}
+          body: ${{ github.event.pull_request.body }}
           draft: false
           prerelease: false
           fail_on_unmatched_files: true
