@@ -108,7 +108,7 @@ jobs:
           ktlint-version: 1.2.1
 
       - name: Coverage
-        if: ${{ inputs.run-code-coverage == 'true' }}
+        if: ${{ inputs.run-code-coverage == true }}
         uses: codecov/codecov-action@v5.4.0
         with:
           files: ./build/reports/jacoco/test/jacocoTestReport.xml

@@ -141,14 +141,14 @@ jobs:
           token: ${{ secrets.workflow-token }}
 
       - name: Download Coverage
-        if: ${{ inputs.run-code-coverage == 'true' }}
+        if: ${{ inputs.run-code-coverage == true }}
         uses: actions/download-artifact@v4
         with:
           name: coverage
           path: ./coverage.xml
 
       - name: Coverage
-        if: ${{ inputs.run-code-coverage == 'true' }}
+        if: ${{ inputs.run-code-coverage == true }}
         uses: codecov/codecov-action@v5.4.0
         with:
           files: ./coverage.xml
