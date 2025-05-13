@@ -132,8 +132,8 @@ jobs:
         env:
           RELEASE_NOTES: ${{ github.event.pull_request.body }}
         run: >-
-          CLEAN_RELEASE_NOTES=$(echo RELEASE_NOTES | sed 's/["'\''`]/ /g')
-          echo "CLEAN_RELEASE_NOTES=CLEAN_RELEASE_NOTES" >> $GITHUB_ENV
+          CLEAN_RELEASE_NOTES=$(echo $RELEASE_NOTES | sed 's/["'\''`]/ /g')
+          echo "CLEAN_RELEASE_NOTES=$CLEAN_RELEASE_NOTES" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
