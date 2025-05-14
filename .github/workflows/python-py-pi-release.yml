@@ -21,14 +21,7 @@ on:
         description: Part of semantic version number to bump
         required: false
         default: minor
-      run-code-coverage:
-        type: boolean
-        description: Value indicating if code coverage step should run
-        required: true
     secrets:
-      codecov-token:
-        description: Codecov code coverage token
-        required: true
       py-pi-token:
         description: Py PI token for publishing Python packages to Python Package Index
         required: true
@@ -139,18 +132,3 @@ jobs:
           fail_on_unmatched_files: true
           make_latest: true
           token: ${{ secrets.workflow-token }}
-
-      - name: Download Coverage
-        if: ${{ inputs.run-code-coverage == true }}
-        uses: actions/download-artifact@v4
-        with:
-          name: coverage
-          path: ./coverage.xml
-
-      - name: Coverage
-        if: ${{ inputs.run-code-coverage == true }}
-        uses: codecov/codecov-action@v5.4.0
-        with:
-          files: ./coverage.xml
-          verbose: true
-          token: ${{ secrets.codecov-token }}

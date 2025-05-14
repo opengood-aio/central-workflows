@@ -1,4 +1,4 @@
-name: python-package-build
+name: python-code-coverage
 
 on:
   workflow_call:
@@ -15,12 +15,13 @@ on:
     secrets:
       codecov-token:
         description: Codecov code coverage token
-        required: false
+        required: true
 
 jobs:
-  python-package-build:
-    name: Python Package Build
+  python-code-coverage:
+    name: Python Code Coverage
     runs-on: ubuntu-latest
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'release') && github.event.pull_request.merged == true && inputs.run-code-coverage == true }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
@@ -44,18 +45,7 @@ jobs:
           pip install pytest pytest-cov
           python -m pytest --cov-config=pyproject.toml
 
-      - name: Install Ruff
-        run: pipx install ruff
-
-      - name: Lint
-        run: ruff check --output-format=github --target-version=py313
-
-      - name: Codestyle
-        run: ruff format --diff --target-version=py313
-        continue-on-error: false
-
       - name: Coverage
-        if: ${{ inputs.run-code-coverage == true }}
         uses: codecov/codecov-action@v5.4.0
         with:
           files: ./coverage.xml
