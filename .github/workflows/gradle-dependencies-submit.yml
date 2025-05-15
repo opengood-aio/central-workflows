@@ -25,8 +25,8 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4.7.1
         with:
-          java-version: ${{ inputs.java-version }}
           distribution: ${{ inputs.java-distribution }}
+          java-version: ${{ inputs.java-version }}
 
       - name: Gradle Dependencies Submission
         uses: gradle/actions/dependency-submission@v4.3.1

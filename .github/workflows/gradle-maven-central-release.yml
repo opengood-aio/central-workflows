@@ -21,11 +21,18 @@ on:
         description: Version of Java JDK to use
         required: false
         default: 21
+      run-code-coverage:
+        type: boolean
+        description: Value indicating if code coverage step should run
+        required: true
       run-gradle-validation:
         type: boolean
         description: Value indicating if Gradle validation step should run
         required: true
     secrets:
+      codecov-token:
+        description: Codecov code coverage token
+        required: false
       gpg-signing-key-id:
         description: GPG signing key identifier for publishing to Maven Central repository
         required: true
@@ -42,7 +49,7 @@ on:
         description: Password for publishing to Maven Central repository
         required: true
       workflow-token:
-        description: GitHub workflow secret for pushing automated commits
+        description: GitHub workflow token for pushing automated commits
         required: true
 
 jobs:
@@ -61,16 +68,17 @@ jobs:
         run: |
           git config user.email ${GIT_EMAIL}
           git config user.name ${GIT_USER}
-          git config url.https://${{ secrets.workflow-token }}@github.com/.insteadOf https://github.com/
+          git config url.https://$GITHUB_TOKEN@github.com/.insteadOf https://github.com/
         env:
           GIT_EMAIL: ${{ inputs.git-email }}
           GIT_USER: ${{ inputs.git-user }}
+          GITHUB_TOKEN: ${{ secrets.workflow-token }}
 
       - name: Setup Java
         uses: actions/setup-java@v4.7.1
         with:
-          java-version: ${{ inputs.java-version }}
           distribution: ${{ inputs.java-distribution }}
+          java-version: ${{ inputs.java-version }}
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4.3.1
@@ -80,9 +88,9 @@ jobs:
       - name: Release and Publish
         run: ./gradlew clean release -PskipTests=true -Prelease.useAutomaticVersion=true
         env:
-          GITHUB_TOKEN: ${{ secrets.workflow-token }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.gpg-signing-key-id }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.gpg-signing-password }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.gpg-signing-private-key }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.maven-central-repo-username }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.maven-central-repo-password }}
+          GITHUB_TOKEN: ${{ secrets.workflow-token }}

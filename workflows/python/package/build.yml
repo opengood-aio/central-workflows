@@ -13,6 +13,8 @@ on:
 
 jobs:
   build:
-    uses: opengood-aio/central-workflows/.github/workflows/python-package-build.yml@python
+    uses: opengood-aio/central-workflows/.github/workflows/python-package-build.yml@main
+    with:
+      run-code-coverage: true
     secrets:
       codecov-token: ${{ secrets.CODECOV_TOKEN }}

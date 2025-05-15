@@ -21,11 +21,18 @@ on:
         description: Version of Java JDK to use
         required: false
         default: 21
+      run-code-coverage:
+        type: boolean
+        description: Value indicating if code coverage step should run
+        required: true
       run-gradle-validation:
         type: boolean
         description: Value indicating if Gradle validation step should run
         required: true
     secrets:
+      codecov-token:
+        description: Codecov code coverage token
+        required: false
       gradle-publish-key:
         description: Gradle plugin key used for publishing to Gradle plugin repository
         required: true
@@ -33,7 +40,7 @@ on:
         description: Gradle plugin secret used for publishing to Gradle plugin repository
         required: true
       workflow-token:
-        description: GitHub workflow secret for pushing automated commits
+        description: GitHub workflow token for pushing automated commits
         required: true
 
 jobs:
@@ -52,16 +59,17 @@ jobs:
         run: |
           git config user.email ${GIT_EMAIL}
           git config user.name ${GIT_USER}
-          git config url.https://${{ secrets.workflow-token }}@github.com/.insteadOf https://github.com/
+          git config url.https://$GITHUB_TOKEN@github.com/.insteadOf https://github.com/
         env:
           GIT_EMAIL: ${{ inputs.git-email }}
           GIT_USER: ${{ inputs.git-user }}
+          GITHUB_TOKEN: ${{ secrets.workflow-token }}
 
       - name: Setup Java
         uses: actions/setup-java@v4.7.1
         with:
-          java-version: ${{ inputs.java-version }}
           distribution: ${{ inputs.java-distribution }}
+          java-version: ${{ inputs.java-version }}
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4.3.1
@@ -71,6 +79,6 @@ jobs:
       - name: Release and Publish
         run: ./gradlew clean release -PskipTests=true -Prelease.useAutomaticVersion=true
         env:
-          GITHUB_TOKEN: ${{ secrets.workflow-token }}
           GRADLE_PUBLISH_KEY: ${{ secrets.gradle-publish-key }}
           GRADLE_PUBLISH_SECRET: ${{ secrets.gradle-publish-secret }}
+          GITHUB_TOKEN: ${{ secrets.workflow-token }}

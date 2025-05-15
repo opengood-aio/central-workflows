@@ -41,8 +41,8 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4.7.1
         with:
-          java-version: ${{ inputs.java-version }}
           distribution: ${{ inputs.java-distribution }}
+          java-version: ${{ inputs.java-version }}
 
       - name: Initialize
         uses: github/codeql-action/init@v3

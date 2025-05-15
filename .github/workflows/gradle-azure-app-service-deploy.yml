@@ -3,13 +3,22 @@ name: gradle-azure-app-service-deploy
 on:
   workflow_call:
     inputs:
-      env:
+      azure-env:
         type: string
-        description: Environment in which to deploy
+        description: Azure environment in which to deploy
         required: true
       azure-app-name:
         type: string
         description: Azure App Service application name
+        required: true
+      azure-app-package-path:
+        type: string
+        description: Azure application package path
+        required: false
+        default: build/libs/*.jar
+      github-maven-package-base-uri:
+        type: string
+        description: GitHub Maven packages base URI
         required: true
     secrets:
       azure-app-credentials:
@@ -22,7 +31,7 @@ on:
         description: Azure App Service application settings
         required: true
       workflow-token:
-        description: GitHub workflow secret for pushing automated commits
+        description: GitHub workflow token for pushing automated commits
         required: true
 
 jobs:
@@ -40,7 +49,7 @@ jobs:
           name=$(awk '/rootProject.name/{print $NF; exit}' settings.gradle.kts | sed s/\'//g | sed s/\"//g)
           version=$(echo "${LABEL}" | sed 's/[^0-9.]*\([0-9.]*\).*/\1/')
           file=${name}-${version}.jar
-          artifact_uri="https://maven.pkg.github.com/${GITHUB_REPOSITORY}/${package}/${name}/${version}/${file}"
+          artifact_uri="$GH_MAVEN_PACKAGE_BASE_URI/${GITHUB_REPOSITORY}/${package}/${name}/${version}/${file}"
           
           mkdir -p build/libs
           cd build/libs
@@ -48,8 +57,9 @@ jobs:
           curl -H "Authorization: token ${GITHUB_TOKEN}" -L ${artifact_uri} -o ${file}
 
         env:
-          GITHUB_TOKEN: ${{ secrets.workflow-token }}
+          GH_MAVEN_PACKAGE_BASE_URI: ${{ inputs.github-maven-package-base-uri }}
           LABEL: ${{ github.event.label.name }}
+          GITHUB_TOKEN: ${{ secrets.workflow-token }}
 
       - name: Azure Login
         uses: azure/login@v2.3.0
@@ -67,4 +77,4 @@ jobs:
         with:
           app-name: ${{ secrets.azure-app-name }}
           publish-profile: ${{ secrets.azure-app-profile }}
-          package: build/libs/*.jar
+          package: ${{ inputs.azure-app-package-path }}

@@ -11,27 +11,31 @@ on:
         type: string
         description: Git user username
         required: true
-      git-name:
-        type: string
-        description: Git name
-        required: true
       python-version:
         type: number
         description: Version of Python to use
         required: false
         default: 3.13
+      bump-part:
+        type: string
+        description: Part of semantic version number to bump
+        required: false
+        default: minor
     secrets:
       py-pi-token:
-        description: Py PI token for publishing packages
+        description: Py PI token for publishing Python packages to Python Package Index
         required: true
       workflow-token:
-        description: GitHub workflow secret for pushing automated commits
+        description: GitHub workflow token for pushing automated commits
         required: true
 
 jobs:
   python-py-pi-release:
     name: Python PyPI Release
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/${{ github.event.repository.name }}
     permissions:
       contents: write
       id-token: write
@@ -47,13 +51,14 @@ jobs:
         run: |
           git config user.email ${GIT_EMAIL}
           git config user.name ${GIT_USER}
-          git config url.https://${{ secrets.workflow-token }}@github.com/.insteadOf https://github.com/
+          git config url.https://$GITHUB_TOKEN@github.com/.insteadOf https://github.com/
         env:
           GIT_EMAIL: ${{ inputs.git-email }}
           GIT_USER: ${{ inputs.git-user }}
+          GITHUB_TOKEN: ${{ secrets.workflow-token }}
 
       - name: Setup Python
-        uses: actions/setup-python@v5.6.0
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python-version }}
           cache: 'pip'
@@ -64,67 +69,66 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
           pip install -r requirements.txt
 
       - name: Install Build
-        run: pip install build --user
-
-      - name: Get Current Version
-        run: echo "CURRENT_VERSION=$(grep 'version' pyproject.toml | cut -d ' ' -f3)" >> $GITHUB_ENV
-
-      - name: Set Release Version
-        uses: FragileTech/bump-version@v1.0.4
-        with:
-          current_version: ${{ env.CURRENT_VERSION }}
-          files: pyproject.toml
-          commit_name: ${{ inputs.git-name }}
-          commit_email: ${{ inputs.git-email }}
-          login: ${{ inputs.git-user }}
-          token: ${{ secrets.workflow_token }}
+        run: python -m pip install build --user
 
       - name: Build Binary Wheel and Source Tarball
         run: python -m build
 
       - name: Upload Distribution Packages
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v4
         with:
           name: python-package-distributions
           path: dist/
 
       - name: Download Distribution Packages
-        uses: actions/download-artifact@v4.3.0
+        uses: actions/download-artifact@v4
         with:
           name: python-package-distributions
           path: dist/
 
-      - name: Sign Distribution Packages
-        uses: sigstore/gh-action-sigstore-python@v3.0.0
-        with:
-          inputs: >-
-            ./dist/*.tar.gz
-            ./dist/*.whl
-
-      - name: Upload Artifact Signatures to GitHub Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.workflow-token }}
-        run: >-
-          gh release upload
-          "$GITHUB_REF_NAME" dist/**
-          --repo "$GITHUB_REPOSITORY"
-
       - name: Publish Distribution Package
-        uses: pypa/gh-action-pypi-publish@v1.12.4
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.py-pi-token }}
 
-      - name: Create GitHub Release
+      - name: Set Release Version and Tag
+        id: set_release_and_tag
+        uses: callowayproject/bump-my-version@master
         env:
-          RELEASE_NOTES: ${{ github.event.pull_request.body }}
-          GITHUB_TOKEN: ${{ secrets.workflow-token }}
-        run: >-
-          CLEAN_RELEASE_NOTES=$(echo RELEASE_NOTES | sed 's/["'\''`]/ /g')
-          echo "CLEAN_RELEASE_NOTES=CLEAN_RELEASE_NOTES" >> $GITHUB_ENV
-          gh release create
-          "$GITHUB_REF_NAME"
-          --repo "$GITHUB_REPOSITORY"
-          --notes "$CLEAN_RELEASE_NOTES"
+          BUMPVERSION_TAG: true
+        with:
+          args: ${{ inputs.bump-part }}
+          github-token: ${{ secrets.workflow-token }}
+
+      - name: Get Release Version
+        run: |
+          echo "RELEASE_VERSION=${{ steps.set_release_and_tag.outputs.previous-version }}" >> $GITHUB_ENV
+          echo "NEXT_DEV_VERSION=${{ steps.set_release_and_tag.outputs.current-version }}" >> $GITHUB_ENV
+
+      - name: Set Next Project Version
+        run: |
+          sed -i "s/^\s*version = \".*\"/version = \"$NEXT_DEV_VERSION\"/" pyproject.toml
+          git add pyproject.toml
+          git commit -m "Update next Python project version from $RELEASE_VERSION to $NEXT_DEV_VERSION"
+
+      - name: Push Next Project Version Change
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.workflow-token }}
+          branch: ${{ github.ref }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_VERSION }}
+          name: ${{ env.RELEASE_VERSION }}
+          body: ${{ github.event.pull_request.body }}
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
+          make_latest: true
+          token: ${{ secrets.workflow-token }}

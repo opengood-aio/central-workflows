@@ -12,8 +12,9 @@ jobs:
   deploy-prod:
     uses: opengood-aio/central-workflows/.github/workflows/gradle-azure-app-service-deploy.yml@main
     with:
-      env: prod
+      azure-env: prod
       azure-app-name: ${{ vars.AZURE_APP_NAME_PROD }}
+      github-maven-package-base-uri: ${{ vars.GH_MAVEN_PACKAGE_BASE_URI }}
     secrets:
       azure-app-credentials: ${{ secrets.AZURE_CREDENTIALS_PROD }}
       azure-app-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_PROD }}
