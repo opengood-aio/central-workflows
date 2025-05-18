@@ -28,8 +28,9 @@ on:
 
 jobs:
   java-kotlin-code-coverage:
-    name: Gradle Plugin Build
+    name: Java-Kotlin Code Coverage
     runs-on: ubuntu-latest
+    if: ${{ inputs.run-code-coverage == true }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
@@ -49,7 +50,6 @@ jobs:
         run: ./gradlew clean build
 
       - name: Coverage
-        if: ${{ inputs.run-code-coverage == true }}
         uses: codecov/codecov-action@v5.4.3
         with:
           files: ./build/reports/jacoco/test/jacocoTestReport.xml
