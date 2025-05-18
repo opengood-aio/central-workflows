@@ -1,0 +1,57 @@
+name: java-kotlin-code-coverage
+
+on:
+  workflow_call:
+    inputs:
+      java-distribution:
+        type: string
+        description: Name of Java JDK distribution to use
+        required: false
+        default: temurin
+      java-version:
+        type: number
+        description: Version of Java JDK to use
+        required: false
+        default: 21
+      run-code-coverage:
+        type: boolean
+        description: Value indicating if code coverage step should run
+        required: true
+      run-gradle-validation:
+        type: boolean
+        description: Value indicating if Gradle validation step should run
+        required: true
+    secrets:
+      codecov-token:
+        description: Codecov code coverage token
+        required: false
+
+jobs:
+  java-kotlin-code-coverage:
+    name: Gradle Plugin Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        
+      - name: Setup Java
+        uses: actions/setup-java@v4.7.1
+        with:
+          distribution: ${{ inputs.java-distribution }}
+          java-version: ${{ inputs.java-version }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4.4.0
+        with:
+          validate-wrappers: ${{ inputs.run-gradle-validation }}
+
+      - name: Build
+        run: ./gradlew clean build
+
+      - name: Coverage
+        if: ${{ inputs.run-code-coverage == true }}
+        uses: codecov/codecov-action@v5.4.3
+        with:
+          files: ./build/reports/jacoco/test/jacocoTestReport.xml
+          verbose: true
+          token: ${{ secrets.codecov-token }}
