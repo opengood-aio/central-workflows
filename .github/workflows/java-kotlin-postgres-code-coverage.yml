@@ -1,0 +1,107 @@
+name: java-kotlin-code-coverage
+
+on:
+  workflow_call:
+    inputs:
+      java-distribution:
+        type: string
+        description: Name of Java JDK distribution to use
+        required: false
+        default: temurin
+      java-version:
+        type: number
+        description: Version of Java JDK to use
+        required: false
+        default: 21
+      postgres-admin-db-uri:
+        type: string
+        description: Postgres admin database connection URI
+        required: true
+      postgres-build-db-uri:
+        type: string
+        description: Postgres database connection URI for performing builds
+        required: true
+      run-code-coverage:
+        type: boolean
+        description: Value indicating if code coverage step should run
+        required: true
+      run-gradle-validation:
+        type: boolean
+        description: Value indicating if Gradle validation step should run
+        required: true
+    secrets:
+      codecov-token:
+        description: Codecov code coverage token
+        required: false
+      postgres-admin-password:
+        description: Postgres admin password
+        required: true
+      postgres-build-db-svc-name:
+        description: Postgres database service account name for performing builds
+        required: true
+      postgres-build-db-svc-password:
+        description: Postgres database service account password for performing builds
+        required: true
+
+jobs:
+  java-kotlin-code-coverage:
+    name: Java-Kotlin Code Coverage with Postgres
+    runs-on: ubuntu-latest
+    if: ${{ inputs.run-code-coverage == true }}
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.postgres-admin-password }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        
+      - name: Setup Java
+        uses: actions/setup-java@v4.7.1
+        with:
+          distribution: ${{ inputs.java-distribution }}
+          java-version: ${{ inputs.java-version }}
+
+      - name: Create Postgres Database and Service Account
+        run: |
+          psql -c "CREATE USER ${POSTGRES_DB_USER} WITH ENCRYPTED PASSWORD '${POSTGRES_DB_PASSWORD}';" ${POSTGRES_DB_URI}
+          psql -f migrations/create_database.sql ${POSTGRES_DB_URI}
+        env:
+          POSTGRES_DB_URI: ${{ inputs.postgres-admin-db-uri }}
+          POSTGRES_DB_USER: ${{ secrets.postgres-build-db-svc-name }}
+          POSTGRES_DB_PASSWORD: ${{ secrets.postgres-build-db-svc-password }}
+
+      - name: Database Migration
+        uses: burrunan/gradle-cache-action@v1
+        with:
+          arguments: flywayMigrate
+          gradle-version: wrapper
+        env:
+          FLYWAY_URL: ${{ inputs.postgres-build-db-uri }}
+          FLYWAY_USER: ${{ secrets.postgres-build-db-svc-name }}
+          FLYWAY_PASSWORD: ${{ secrets.postgres-build-db-svc-password }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4.4.0
+        with:
+          validate-wrappers: ${{ inputs.run-gradle-validation }}
+
+      - name: Build
+        run: ./gradlew clean build
+
+      - name: Coverage
+        uses: codecov/codecov-action@v5.4.3
+        with:
+          files: ./build/reports/jacoco/test/jacocoTestReport.xml
+          verbose: true
+          token: ${{ secrets.codecov-token }}
