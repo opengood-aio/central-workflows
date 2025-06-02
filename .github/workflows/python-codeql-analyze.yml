@@ -9,11 +9,6 @@ on:
         required: false
         default: 3.13
 
-  workflow_dispatch:
-  schedule:
-    # Automatically run every Sunday at midnight
-    - cron: '0 0 * * 0'
-
 jobs:
   analyze:
     name: Analyze
