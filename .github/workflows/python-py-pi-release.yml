@@ -42,7 +42,7 @@ jobs:
     if: ${{ contains(github.event.pull_request.labels.*.name, 'release') && github.event.pull_request.merged == true }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5.0.0
         with:
           persist-credentials: false
           token: ${{ secrets.workflow-token }}
@@ -85,7 +85,7 @@ jobs:
           path: dist/
 
       - name: Download Distribution Packages
-        uses: actions/download-artifact@v4.3.0
+        uses: actions/download-artifact@v5.0.0
         with:
           name: python-package-distributions
           path: dist/
@@ -97,7 +97,7 @@ jobs:
 
       - name: Set Release Version and Tag
         id: set_release_and_tag
-        uses: callowayproject/bump-my-version@1.2.0
+        uses: callowayproject/bump-my-version@1.2.1
         env:
           BUMPVERSION_TAG: true
         with:

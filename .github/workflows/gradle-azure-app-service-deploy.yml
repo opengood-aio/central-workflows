@@ -41,7 +41,7 @@ jobs:
     if: ${{ contains(github.event.pull_request.labels.*.name, format('deploy {0}', inputs.env)) && github.event.pull_request.merged == true }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5.0.0
 
       - name: Download Release Artifact
         run: |
@@ -73,7 +73,7 @@ jobs:
           app-settings-json: ${{ secrets.azure-app-settings }}
 
       - name: Deploy
-        uses: azure/webapps-deploy@v3.0.1
+        uses: azure/webapps-deploy@v3.0.6
         with:
           app-name: ${{ secrets.azure-app-name }}
           publish-profile: ${{ secrets.azure-app-profile }}
