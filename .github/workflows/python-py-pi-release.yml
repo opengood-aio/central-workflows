@@ -97,7 +97,7 @@ jobs:
 
       - name: Set Release Version and Tag
         id: set_release_and_tag
-        uses: callowayproject/bump-my-version@1.2.1
+        uses: callowayproject/bump-my-version@1.2.2
         env:
           BUMPVERSION_TAG: true
         with:
@@ -116,13 +116,13 @@ jobs:
           git commit -m "Update next Python project version from $RELEASE_VERSION to $NEXT_DEV_VERSION"
 
       - name: Push Next Project Version Change
-        uses: ad-m/github-push-action@v0.8.0
+        uses: ad-m/github-push-action@v1.0.0
         with:
           github_token: ${{ secrets.workflow-token }}
           branch: ${{ github.ref }}
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2.3.2
+        uses: softprops/action-gh-release@v2.3.3
         with:
           tag_name: ${{ env.RELEASE_VERSION }}
           name: ${{ env.RELEASE_VERSION }}
