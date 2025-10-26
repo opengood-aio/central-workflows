@@ -79,13 +79,13 @@ jobs:
         run: python -m build
 
       - name: Upload Distribution Packages
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v5.0.0
         with:
           name: python-package-distributions
           path: dist/
 
       - name: Download Distribution Packages
-        uses: actions/download-artifact@v5.0.0
+        uses: actions/download-artifact@v6.0.0
         with:
           name: python-package-distributions
           path: dist/
