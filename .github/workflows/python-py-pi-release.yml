@@ -79,13 +79,13 @@ jobs:
         run: python -m build
 
       - name: Upload Distribution Packages
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: python-package-distributions
           path: dist/
 
       - name: Download Distribution Packages
-        uses: actions/download-artifact@v6.0.0
+        uses: actions/download-artifact@v7.0.0
         with:
           name: python-package-distributions
           path: dist/
@@ -97,7 +97,7 @@ jobs:
 
       - name: Set Release Version and Tag
         id: set_release_and_tag
-        uses: callowayproject/bump-my-version@1.2.4
+        uses: callowayproject/bump-my-version@1.2.5
         env:
           BUMPVERSION_TAG: true
         with:
