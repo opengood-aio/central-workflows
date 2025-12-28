@@ -18,6 +18,6 @@ jobs:
           token: ${{ secrets.workflow-token }}
 
       - name: Update Workflow License Copyright
-        uses: FantasticFiasco/action-update-license-year@v3.0.3
+        uses: FantasticFiasco/action-update-license-year@v3.0.4
         with:
           token: ${{ secrets.workflow-token }}
